@@ -8,18 +8,17 @@ To configure the License SDK as a library:
  1. Include the License SDK codebase
  2. Load the library by including the License.php file
  3. Configure the system constants
- 4. Set a WP Schedule action to check the license validy
- 5. (Optional) Validity function to use in your plugin to determine if the plugin is active or not
+ 4. Set a WP Schedule action to check the license validity
 
 ### 1. Including the codebase
 
-Using a subtree in your plugin, theme or site’s Git repository to include License SDK is the recommended method.
+Using a subtree in your plugin to include License SDK is the recommended method.
 
 #### Step 1. Add the Repository as a Remote
 
 git remote add -f subtree-license-sdk https://github.com/otakupahp/sdk-license-manager-for-woocommerce.git
 
-Adding the subtree as a remote allows us to refer to it in short from via the name subtree-license-sdk, instead of the full GitHub URL.
+Adding the subtree as a remote allows us to refer to it in a short form via the name subtree-license-sdk, instead of the full GitHub URL.
 
 #### Step 2. Add the Repo as a Subtree
 
@@ -53,7 +52,7 @@ Add the following constants definition in the root of your plugin:
 
 ```
 # License Manager Constants
-define( 'LMFW_API_URL', 'https://example.com/wp-json/lmfwc/v2/' ); //Replace with the URL of your license server
+define( 'LMFW_API_URL', 'https://example.com' ); //Replace with the URL of your license server (without the trailing slash)
 define( 'LMFW_CK', 'ck_xxxxx' ); //Customer key created in the license server
 define( 'LMFW_CS', 'cs_yyyyy' ); //Customer secret created in the license server
 define( 'LMFW_PRODUCT_ID', [111,222] ); //Set an array of the products IDs on your license server
@@ -80,21 +79,63 @@ if ( ! wp_next_scheduled( 'lmfw_sdk_license_validity' ) ) {
 add_action('lmfw_sdk_license_validity', 'lmfw_license_is_active');
 ```
 
-### 5. Validity check function
-
-Once you configured everything, you could create the function to check is the plugin is active or not
-
-```
-  /**
-   * Check if the plugin is active or not.
-   * The SDK will check if the Valid Object has expired or not to make a new call
-   *
-   * @return bool
-   */
-  public function lmfw_license_is_active() {
-    return $sdk_license->validate_status();
-  }  
-```
-
 ## Use the library
-TODO
+
+The SDK contains many basic functions that use the v2 API routes
+
+### Check if the Licence registered is valid
+
+**END POINT REQUIRED: `GET - v2/licenses/{license_key}`**
+
+To check if the last activated license is valid, you could invoke *valudate_status*.
+
+```
+  $sdk_license->validate_status();
+```
+
+To check if a specific license is valid, you could send the license and force i
+
+```
+  $sdk_license->validate_status('LICENSE-GENERATED-KEY');
+```
+
+This function will return an array with 2 keys *is_valid* (boolean that indicates if the license is valid or not) and *error* (a string with the error message in case the license is invalid)
+
+
+### Activate a license
+
+**END POINT REQUIRED: `GET - v2/licenses/activate/{license_key}`**
+
+Activate the license provided. It is suggested to first validate the license since this will return an error if the license is invalid.
+
+```
+  $sdk_license->activate('LICENSE-GENERATED-KEY');
+```
+
+The function will create a valid object and store it on the database, then return the license object returned by the license server.
+
+This function throws an Exception if anything fails.
+
+### Deactivate a license
+
+**END POINT REQUIRED: `GET - v2/licenses/deactivate/{license_key}`**
+
+Deactivate the license provided.
+
+```
+  $sdk_license->deactivate('LICENSE-GENERATED-KEY');
+```
+
+The function will delete the valid object stored on the database.
+
+This function throws an Exception if anything fails.
+
+### Check license validity
+
+This is an internal function to check the license validity if it exists.
+
+```
+  $sdk_license->valid_until();
+```
+
+This function returns a timestamp value.
