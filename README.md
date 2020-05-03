@@ -16,13 +16,17 @@ Using a subtree in your plugin to include License SDK is the recommended method.
 
 #### Step 1. Add the Repository as a Remote
 
+```
 git remote add -f subtree-license-sdk https://github.com/otakupahp/sdk-license-manager-for-woocommerce.git
+```
 
 Adding the subtree as a remote allows us to refer to it in a short form via the name subtree-license-sdk, instead of the full GitHub URL.
 
 #### Step 2. Add the Repo as a Subtree
 
+```
 git subtree add --prefix libraries/license-sdk subtree-license-sdk master --squash
+```
 
 This will add the master branch of License SDK to your repository in the folder libraries/license-sdk.
 
@@ -32,8 +36,10 @@ You can change the --prefix to change where the code is included.
 
 To update License SDK to a new version, use the commands:
 
+```
 git fetch subtree-license-sdk master
 git subtree pull --prefix libraries/license-sdk subtree-license-sdk master --squash
+```
 
 ### 2. Loading the library
 
