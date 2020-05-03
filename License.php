@@ -90,7 +90,7 @@ class License {
 		}
 
 		# Connection variables
-		$this->api_url         = LMFW_API_URL;
+		$this->api_url         = LMFW_API_URL . '/wp-json/lmfwc/v2/';
 		$this->customer_key    = LMFW_CK;
 		$this->customer_secret = LMFW_CS;
 		
