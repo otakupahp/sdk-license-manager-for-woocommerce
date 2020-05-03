@@ -18,7 +18,7 @@ use Exception;
 class License {
 
 	/**
-	 * @since 1.1.0
+	 * @since 1.0.0
 	 * @access private
 	 * @var string
 	 */
@@ -53,14 +53,14 @@ class License {
 	private $valid_status;
 
 	/**
-	 * @since 1.1.0
+	 * @since 1.0.0
 	 * @access private
 	 * @var array
 	 */
 	private $product_ids;
 
 	/**
-	 * @since 3.1.0
+	 * @since 1.0.0
 	 * @access private
 	 * @var string
 	 */
@@ -94,12 +94,12 @@ class License {
 		$this->customer_key    = LMFW_CK;
 		$this->customer_secret = LMFW_CS;
 		
-    # Check the product IDs
+    		# Check the product IDs
 		if( defined('LMFW_PRODUCT_ID')) {
 			$this->product_ids =  is_array( LMFW_PRODUCT_ID ) ? LMFW_PRODUCT_ID : [LMFW_PRODUCT_ID];
 		}
 		
-    # Get license key stored in the database
+    		# Get license key stored in the database
 		$this->stored_license = null;
 		if( defined('LMFE_LICENSE_OPTION') && defined('LMFE_LICENSE_OPTION_KEY') ) {
 			$license = get_option(LMFE_LICENSE_OPTION);
