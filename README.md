@@ -30,7 +30,7 @@ git subtree add --prefix libraries/license-sdk subtree-license-sdk master --squa
 
 This will add the master branch of License SDK to your repository in the folder libraries/license-sdk.
 
-You can change the --prefix to change where the code is included.
+You can change the --prefix to point where the code is included.
 
 #### Step 3. Update the Subtree
 
