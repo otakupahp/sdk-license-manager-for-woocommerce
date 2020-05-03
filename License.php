@@ -212,22 +212,21 @@ class License {
 	 * @since 1.0.0
 	 *
 	 * @param $license_key
-	 * @param $force_validation
 	 * @return array
 	 *
 	 */
-	public function validate_status($license_key = '', $force_validation = false) {
+	public function validate_status($license_key = '') {
 
 		# Generic valid result
 		$valid_result = [
 			'is_valid' => false,
-			'error' => __( 'No se ha activado la licencia', $this->plugin_name ),
+			'error' => __('The license has not been activated yet', $this->plugin_name ),
 		];
 
 		$current_time = time();
 
 		# Use validation object if not force to validate
-		if( $force_validation === false && isset($this->valid_status['nextValidation']) && $this->valid_status['nextValidation'] > $current_time ) {
+		if( empty( $license_key ) && isset($this->valid_status['nextValidation']) && $this->valid_status['nextValidation'] > $current_time ) {
 			$valid_result['is_valid'] = $this->valid_status['is_valid'];
 			$valid_result['error'] = $this->valid_status['error'];
 		}
@@ -240,7 +239,7 @@ class License {
 
 			# If there is no license
 			if ( empty( $license_key ) ) {
-				$valid_result['error'] = __( 'No se ha enviado una licencia', $this->plugin_name );
+				$valid_result['error'] = __( 'A license has not been submitted', $this->plugin_name );
 			}
 			else {
 				try {
@@ -253,14 +252,15 @@ class License {
 						# If license key does not belongs to the Product id.
 						# if not Product id is defined, then this validation is omitted
 						if ( ! empty( $this->product_ids ) && ! in_array( $response['data']['productId'], $this->product_ids ) ) {
-							$valid_result['error'] = __( 'La licencia ingresada no pertenece a este plugin', $this->plugin_name );
+							$valid_result['error'] = __( 'The license entered does not belong to this plugin', $this->plugin_name );
 						}
 						# Check that the license has not reached the expiration date
 						# if no expiration date is set, omit this
 						elseif ( $this->valid_status['valid_until'] !== null && $this->valid_status['valid_until'] < time() ) {
-							$valid_result['error'] = __( 'La licencia ingresada está expirada', $this->plugin_name );
+							$valid_result['error'] = __( 'The license entered is expired', $this->plugin_name );
 						} else {
 							$valid_result['is_valid'] = true;
+							$valid_result['error'] = '';
 						}
 
 					}
