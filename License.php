@@ -3,7 +3,6 @@
 namespace LMFW\SDK;
 
 use ErrorException;
-use Exception;
 
 /**
  * License Manager for WooCommerce SDK to let communication with the API
@@ -65,6 +64,20 @@ class License {
 	 * @var string
 	 */
 	private $stored_license;
+	
+	/**
+	 * @since 1.0.0
+	 * @access private
+	 * @var string
+	 */
+	private $valid_object;
+	
+	/**
+	 * @since 1.0.0
+	 * @access private
+	 * @var int
+	 */
+	private $ttl;
 
 	/**
 	 * License constructor
@@ -78,6 +91,7 @@ class License {
 	 * @param mixed $product_ids
 	 * @param array $license_options
 	 * @param string $valid_object
+	 * @param int $ttl
 	 */
 	public function __construct(
 		$plugin_name, 
@@ -86,18 +100,12 @@ class License {
 		$customer_secret, 
 		$product_ids,
 		$license_options,
-		$valid_object
+		$valid_object,
+		$ttl
 	) {
 
+		# Set plugin name for internacionalization
 		$this->plugin_name = $plugin_name;
-
-		if( !defined('LMFW_VALID_OBJECT')) {
-			define('LMFW_VALID_OBJECT', 'lmfw-is-valid');
-		}
-
-		if( !defined('LMFW_VALIDATION_TTL')) {
-			define('LMFW_VALIDATION_TTL', 5);
-		}
 
 		# Connection variables
 		$this->api_url         = "{$server_url}/wp-json/lmfwc/v2/";
@@ -119,6 +127,9 @@ class License {
 			$this->stored_license = get_option($license_options['option_key']);
 		}
 		
+		# License variables
+		$this->valid_object = $valid_object;
+		$this->ttl = $ttl;
 		$this->valid_status = get_option($valid_object, []);
 
 	}
@@ -195,7 +206,7 @@ class License {
 				$this->valid_status['is_valid'] = false;
 				$this->valid_status['error'] = $response['message'];
 				$this->valid_status['nextValidation'] = time();
-				update_option(LMFW_VALID_OBJECT, $this->valid_status);
+				update_option($this->valid_object, $this->valid_status);
 				throw new Exception($response['message']);
 			}
 		}
@@ -214,7 +225,7 @@ class License {
 		if( !empty($license_key) ) {
 			$this->call( "licenses/deactivate/{$license_key}" );
 		}
-		delete_option(LMFW_VALID_OBJECT);
+		delete_option($this->valid_object);
 	}
 
 	/**
@@ -284,10 +295,10 @@ class License {
 		}
 
 		# Update validation object
-		$this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . '+ ' . LMFW_VALIDATION_TTL . ' days' );
+	$this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . "+ {$this->ttl} days" );
 		$this->valid_status['is_valid'] = $valid_result['is_valid'];
 		$this->valid_status['error'] = $valid_result['error'];
-		update_option(LMFW_VALID_OBJECT, $this->valid_status);
+		update_option($this->valid_object, $this->valid_status);
 
 		return $valid_result;
 
