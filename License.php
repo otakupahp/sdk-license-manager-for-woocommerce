@@ -101,10 +101,10 @@ class License {
 		
     		# Get license key stored in the database
 		$this->stored_license = null;
-		if( defined('LMFE_LICENSE_OPTION') && defined('LMFE_LICENSE_OPTION_KEY') ) {
-			$license = get_option(LMFE_LICENSE_OPTION);
+		if( defined('LMFW_LICENSE_OPTION') && defined('LMFW_LICENSE_OPTION_KEY') ) {
+			$license = get_option(LMFW_LICENSE_OPTION);
 			if($license !== false) {
-				$this->stored_license = $license[LMFE_LICENSE_OPTION_KEY];
+				$this->stored_license = $license[LMFW_LICENSE_OPTION_KEY];
 			}
 		}
 
@@ -273,7 +273,7 @@ class License {
 		}
 
 		# Update validation object
-		$this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . '+ ' . LMFE_VALIDATION_TTL . ' days' );
+		$this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . '+ ' . LMFW_VALIDATION_TTL . ' days' );
 		$this->valid_status['is_valid'] = $valid_result['is_valid'];
 		$this->valid_status['error'] = $valid_result['error'];
 		update_option(LMFW_VALID_OBJECT, $this->valid_status);
