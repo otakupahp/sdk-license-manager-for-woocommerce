@@ -104,7 +104,7 @@ class License {
 		$ttl
 	) {
 
-		# Set plugin name for internacionalization
+		# Set plugin name for internationalization
 		$this->plugin_name = $plugin_name;
 
 		# Connection variables
@@ -117,7 +117,7 @@ class License {
 		
     		# Get license key stored in the database
 		$this->stored_license = null;
-		if( isset($license_options['settings_key']) ) {  // Check if WP Settings are used to store the licnese key
+		if( isset($license_options['settings_key']) ) {  // Check if WP Settings are used to store the license key
 			$license = get_option($license_options['settings_key']);
 			if($license !== false) {
 				$this->stored_license = $license[$license_options['option_key']];
@@ -192,7 +192,7 @@ class License {
 	 *
 	 * @param $license_key
 	 * @return array|null
-	 * @throws Exception
+	 * @throws ErrorException
 	 *
 	 */
 	public function activate($license_key) {
@@ -207,7 +207,7 @@ class License {
 				$this->valid_status['error'] = $response['message'];
 				$this->valid_status['nextValidation'] = time();
 				update_option($this->valid_object, $this->valid_status);
-				throw new Exception($response['message']);
+				throw new ErrorException($response['message']);
 			}
 		}
 
