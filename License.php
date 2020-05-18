@@ -72,8 +72,22 @@ class License {
 	 * @since 1.0.0
 	 *
 	 * @param string $plugin_name
+	 * @param string $server_url
+	 * @param string $customer_key
+	 * @param string $customer_secret
+	 * @param mixed $product_ids
+	 * @param array $license_options
+	 * @param string $valid_object
 	 */
-	public function __construct($plugin_name) {
+	public function __construct(
+		$plugin_name, 
+		$server_url, 
+		$customer_key, 
+		$customer_secret, 
+		$product_ids,
+		$license_options,
+		$valid_object
+	) {
 
 		$this->plugin_name = $plugin_name;
 
@@ -86,25 +100,26 @@ class License {
 		}
 
 		# Connection variables
-		$this->api_url         = LMFW_API_URL . '/wp-json/lmfwc/v2/';
-		$this->customer_key    = LMFW_CK;
-		$this->customer_secret = LMFW_CS;
+		$this->api_url         = "{$server_url}/wp-json/lmfwc/v2/";
+		$this->customer_key    = $customer_key;
+		$this->customer_secret = $customer_secret;
 		
-    		# Check the product IDs
-		if( defined('LMFW_PRODUCT_ID')) {
-			$this->product_ids =  is_array( LMFW_PRODUCT_ID ) ? LMFW_PRODUCT_ID : [LMFW_PRODUCT_ID];
-		}
+    		# Product IDs
+		$this->product_ids =  is_array( $product_ids ) ? $product_ids : [$product_ids];
 		
     		# Get license key stored in the database
 		$this->stored_license = null;
-		if( defined('LMFW_LICENSE_OPTION') && defined('LMFW_LICENSE_OPTION_KEY') ) {
-			$license = get_option(LMFW_LICENSE_OPTION);
+		if( isset($license_options['settings_key']) ) {  // Check if WP Settings are used to store the licnese key
+			$license = get_option($license_options['settings_key']);
 			if($license !== false) {
-				$this->stored_license = $license[LMFW_LICENSE_OPTION_KEY];
+				$this->stored_license = $license[$license_options['option_key']];
 			}
 		}
-
-		$this->valid_status = get_option(LMFW_VALID_OBJECT, []);
+		elseif( isset($license_options['option_key']) ) {  // If no WP Settings are used to store the license key
+			$this->stored_license = get_option($license_options['option_key']);
+		}
+		
+		$this->valid_status = get_option($valid_object, []);
 
 	}
 
