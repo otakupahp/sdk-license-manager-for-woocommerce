@@ -78,14 +78,22 @@ The *LMFW_VALID_OBJECT* constant is used to determine if the license is valid or
 ### 4. Set schedule action
 
 ```
-# Schedule license validity check event
-if ( ! wp_next_scheduled( 'lmfw_sdk_license_validity' ) ) {
-  wp_schedule_event( time(), 'daily', 'lmfw_sdk_license_validity' );
+# Schedule license validity check event (use a unique schedule name)
+if( !wp_next_scheduled( 'unique_plugin_name_license_validity' ) ) {
+  wp_schedule_event( time(), 'daily', 'unique_plugin_name_license_validity' );
 }
 
-# Add validity function
-add_action('lmfw_sdk_license_validity', 'lmfw_license_is_active');
+# Add validity function hook
+add_action('unique_plugin_name_license_validity', 'unique_validation_function');
+
+# Create the validity function called by the hook
+function unique_validation_function() {
+  $valid_status = $this->license->validate_status();
+  return $valid_status['is_valid'];
+}
 ```
+
+You could modify the validation function as needed
 
 ## Use the library
 
