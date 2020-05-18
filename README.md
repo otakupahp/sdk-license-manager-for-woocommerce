@@ -59,18 +59,17 @@ If you use autoloading, you could use `LMFW\SDK\License` instead of requiring th
 Add the following constants definition in the root of your plugin:
 
 ```
-# License Manager Constants
-define( 'LMFW_API_URL', 'https://example.com' ); //Replace with the URL of your license server (without the trailing slash)
-define( 'LMFW_CK', 'ck_xxxxx' ); //Customer key created in the license server
-define( 'LMFW_CS', 'cs_yyyyy' ); //Customer secret created in the license server
-define( 'LMFW_PRODUCT_ID', [111,222] ); //Set an array of the products IDs on your license server
-define( 'LMFW_VALID_OBJECT', 'plugin-is-valid' );  //Set a unique value to avoid conflict with other plugins
-define( 'LMFW_VALIDATION_TTL', 5 ); //How many days the valid object will be used before calling the license server
-define( 'LMFW_LICENSE_OPTION_KEY', 'plugin_license' ); //Set a unique value to avoid conflict with other plugins
-define( 'NO_LICENSE', 'xxxxxx');
-
-# Create an instance of your plugin
-$sdk_license = new LMFW\SDK\License( $plugin_name );  // The plugin name is used to manage internationalization
+# Create an instance of the License SDK
+$sdk_license = new LMFW\SDK\License( 
+ $plugin_name,   // The plugin name is used to manage internationalization
+ 'https://example.com', //Replace with the URL of your license server (without the trailing slash)
+ 'ck_xxxxx', //Customer key created in the license server
+ 'cs_yyyyy', //Customer secret created in the license server
+ [111,222], //Set an array of the products IDs on your license server
+ 'plugin_license', //Set a unique value to avoid conflict with other plugins
+ 'plugin-is-valid',  //Set a unique value to avoid conflict with other plugins
+ 5 //How many days the valid object will be used before calling the license server
+);
 ```
 
 The *LMFW_VALID_OBJECT* constant is used to determine if the license is valid or not. An object is stored in the options table to avoid API calls overload to your license server. 
