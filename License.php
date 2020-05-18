@@ -77,16 +77,12 @@ class License {
 
 		$this->plugin_name = $plugin_name;
 
-		if( !defined('LMFW_ENVIRONMENT')) {
-			define('LMFW_ENVIRONMENT', self::PRODUCTION);
-		}
-
 		if( !defined('LMFW_VALID_OBJECT')) {
 			define('LMFW_VALID_OBJECT', 'lmfw-is-valid');
 		}
 
-		if( !defined('LMFE_VALIDATION_TTL')) {
-			define('LMFE_VALIDATION_TTL', 5);
+		if( !defined('LMFW_VALIDATION_TTL')) {
+			define('LMFW_VALIDATION_TTL', 5);
 		}
 
 		# Connection variables
