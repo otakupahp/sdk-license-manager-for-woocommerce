@@ -117,7 +117,7 @@ To check if the last activated license is valid, you could invoke *valudate_stat
   $sdk_license->validate_status();
 ```
 
-To check if a specific license is valid, you could send the license and force i
+To check if a specific license is valid, you could send the license and force the validation
 
 ```
   $sdk_license->validate_status('LICENSE-GENERATED-KEY');
