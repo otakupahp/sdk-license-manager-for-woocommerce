@@ -72,7 +72,16 @@ $sdk_license = new LMFW\SDK\License(
 );
 ```
 
-The *LMFW_VALID_OBJECT* constant is used to determine if the license is valid or not. An object is stored in the options table to avoid API calls overload to your license server. 
+If WP Setting API is used, *plugin-license* string can be replaced for an array containing the setting object and the license key like this:
+
+```
+[
+  'settings_key' => 'plugin_settings',
+  'option_key' => 'plugin_license'
+]
+```
+
+The *plugin-is-valid* string is used to determine if the license is valid or not. An object is stored in the options table to avoid API calls overload to your license server. 
 
 ### 4. Set schedule action
 
