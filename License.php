@@ -20,13 +20,6 @@ if( !class_exists('LMFW\SDK\License') ) {
     {
 
         /**
-         * @since 2.0.0
-         * @access private
-         * @var $instance
-         */
-        private static $instance = null;
-
-        /**
          * @since 1.0.0
          * @access private
          * @var string
@@ -88,39 +81,6 @@ if( !class_exists('LMFW\SDK\License') ) {
          * @var int
          */
         private $ttl;
-
-        /**
-         * The singleton instance
-         *
-         * @param string $plugin_name
-         * @param string $server_url
-         * @param string $customer_key
-         * @param string $customer_secret
-         * @param mixed $product_ids
-         * @param array $license_options
-         * @param string $valid_object
-         * @param int $ttl
-         * @return License
-         * @since 2.0.0
-         *
-         */
-        public static function get_instance(
-            $plugin_name,
-            $server_url,
-            $customer_key,
-            $customer_secret,
-            $product_ids,
-            $license_options,
-            $valid_object,
-            $ttl
-        )
-        {
-            if (self::$instance == null) {
-                self::$instance = new License($plugin_name, $server_url, $customer_key, $customer_secret, $product_ids, $license_options, $valid_object, $ttl);
-            }
-
-            return self::$instance;
-        }
 
         /**
          * License constructor
