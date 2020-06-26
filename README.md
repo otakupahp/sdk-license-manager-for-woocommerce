@@ -96,7 +96,7 @@ add_action('unique_plugin_name_license_validity', 'unique_validation_function');
 
 # Create the validity function called by the hook
 function unique_validation_function() {
-  $valid_status = $this->license->validate_status();
+  $valid_status = $sdk_license->validate_status();
   return $valid_status['is_valid'];
 }
 ```
