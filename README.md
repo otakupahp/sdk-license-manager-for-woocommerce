@@ -1,6 +1,8 @@
 # SDK for License Manager for WooCommerce
 A simple SDK to include in your plugins using the great [License Manager for WooCommerce](https://github.com/drazenbebic/license-manager-for-woocommerce) created by [Drazen Bebic](https://github.com/drazenbebic).
 
+You could find more info about the plugin in its [web page](https://www.licensemanager.at/).
+
 Pull requests to improve this SDK are greatly appreciated.
 
 ## Configuring Library
