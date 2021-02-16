@@ -113,7 +113,7 @@ The SDK contains many basic functions that use the v2 API routes
 
 **END POINT REQUIRED: `GET - v2/licenses/{license_key}`**
 
-To check if the last activated license is valid, you could invoke *valudate_status*.
+To check if the last activated license is valid, you could invoke *validate_status*.
 
 ```
   $sdk_license->validate_status();
