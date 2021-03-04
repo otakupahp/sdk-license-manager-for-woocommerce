@@ -293,13 +293,14 @@ if( !class_exists('LMFW\SDK\License') ) {
                         $valid_result['error'] = $exception->getMessage();
                     }
                 }
+                
+                # Update validation object
+                $this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . "+ {$this->ttl} days");
+                $this->valid_status['is_valid'] = $valid_result['is_valid'];
+                $this->valid_status['error'] = $valid_result['error'];
+                update_option($this->valid_object, $this->valid_status);
+            
             }
-
-            # Update validation object
-            $this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . "+ {$this->ttl} days");
-            $this->valid_status['is_valid'] = $valid_result['is_valid'];
-            $this->valid_status['error'] = $valid_result['error'];
-            update_option($this->valid_object, $this->valid_status);
 
             return $valid_result;
 
