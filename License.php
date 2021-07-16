@@ -250,6 +250,7 @@ if( !class_exists('LMFW\SDK\License') ) {
             ];
 
             $current_time = time();
+            $ttl = 0;
 
             # Use validation object if not force to validate
             if (empty($license_key) && isset($this->valid_status['nextValidation']) && $this->valid_status['nextValidation'] > $current_time) {
@@ -280,11 +281,12 @@ if( !class_exists('LMFW\SDK\License') ) {
                             }
                             # Check that the license has not reached the expiration date
                             # if no expiration date is set, omit this
-                            elseif ($this->valid_status['valid_until'] !== null && $this->valid_status['valid_until'] < time()) {
-                                $valid_result['error'] = __('The license entered is expired', $this->plugin_name);
+                            elseif ($this->valid_status['valid_until'] !== null && $this->valid_status['valid_until'] < $current_time) {
+                                $valid_result['error'] = __('The license expired', $this->plugin_name);
                             } else {
                                 $valid_result['is_valid'] = true;
                                 $valid_result['error'] = '';
+                                $ttl = $this->ttl;
                             }
 
                         }
@@ -295,7 +297,7 @@ if( !class_exists('LMFW\SDK\License') ) {
                 }
                 
                 # Update validation object
-                $this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . "+ {$this->ttl} days");
+                $this->valid_status['nextValidation'] = strtotime(date('Y-m-d') . "+ {$ttl} days");
                 $this->valid_status['is_valid'] = $valid_result['is_valid'];
                 $this->valid_status['error'] = $valid_result['error'];
                 update_option($this->valid_object, $this->valid_status);
