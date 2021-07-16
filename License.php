@@ -123,9 +123,9 @@ if( !class_exists('LMFW\SDK\License') ) {
             $this->stored_license = null;
             if (isset($license_options['settings_key'])) {  // Check if WP Settings are used to store the license key
                 $license = get_option($license_options['settings_key']);
-                if ($license !== false) {
-                    $this->stored_license = $license[$license_options['option_key']];
-                }
+                if ( $license !== false && isset( $license_options['option_key'] ) ) {
+					$this->stored_license = $license[ $license_options['option_key'] ];
+				}
             } elseif (isset($license_options['option_key'])) {  // If no WP Settings are used to store the license key
                 $this->stored_license = get_option($license_options['option_key']);
             }
