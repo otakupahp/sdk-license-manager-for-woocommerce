@@ -12,7 +12,7 @@
 		 * Defines basic functionality to connect with the API
 		 *
 		 * @since      1.0.0
-		 * @version    1.1.0
+		 * @version    2.0.0
 		 * @package    Pahp/SDK
 		 * @subpackage License
 		 * @author     Pablo Hernández (OtakuPahp) <pablo@otakupahp.com>
@@ -20,34 +20,44 @@
 		class License {
 
 			/**
-			 * License Manager for WooCommerce API base URL.
+			 * License Manager for WooCommerce API base URL used by direct legacy mode.
 			 *
 			 * @since 1.0.0
-			 * @version 1.1.0
+			 * @version 2.0.0
 			 * @access private
 			 * @var string
 			 */
 			private string $api_url;
 
 			/**
-			 * Customer key used to authenticate with the API.
+			 * Customer key used to authenticate with the API in direct legacy mode.
 			 *
 			 * @since   1.0.0
-			 * @version 1.1.0
+			 * @version 2.0.0
 			 * @access  private
 			 * @var string $customer_key
 			 */
 			private string $customer_key;
 
 			/**
-			 * Customer secret used to authenticate with the API.
+			 * Customer secret used to authenticate with the API in direct legacy mode.
 			 *
 			 * @since   1.0.0
-			 * @version 1.1.0
+			 * @version 2.0.0
 			 * @access private
 			 * @var string $customer_secret
 			 */
 			private string $customer_secret;
+
+			/**
+			 * Broker/proxy base URL used by the recommended broker mode.
+			 *
+			 * @since 1.2.0
+			 * @version 2.0.0
+			 * @access private
+			 * @var string
+			 */
+			private string $broker_url;
 
 			/**
 			 * Cached license validation state stored in the WordPress options table.
@@ -102,29 +112,46 @@
 			/**
 			 * License constructor
 			 *
-			 * @param string                                                   $server_url      License server base URL, without trailing slash.
-			 * @param string                                                   $customer_key    License Manager for WooCommerce consumer key.
-			 * @param string                                                   $customer_secret License Manager for WooCommerce consumer secret.
+			 * @param string                                                   $server_url      License server base URL in direct legacy mode, or broker URL in broker mode when credentials are omitted.
+			 * @param string|null                                              $customer_key    License Manager for WooCommerce consumer key for direct legacy mode, or null/empty for broker mode.
+			 * @param string|null                                              $customer_secret License Manager for WooCommerce consumer secret for direct legacy mode, or null/empty for broker mode.
 			 * @param array<int, int|string>|int|string                        $product_ids     Accepted product IDs, or an empty array to skip product validation.
 			 * @param array{settings_key?: string, option_key?: string}|string $license_options License option key, or WP Settings API keys.
 			 * @param string                                                   $valid_object    Option key for cached validation state.
 			 * @param int                                                      $ttl             Days before revalidating cached status.
+			 * @param array{broker_url?: string}                               $request_options Optional request options. Set broker_url to explicitly route calls through a proxy; this takes precedence over broker autodetection.
 			 * @since 1.0.0
-			 * @version 1.1.0
+			 * @version 2.0.0
 			 *
 			 */
 			public function __construct(
 				string $server_url,
-				string $customer_key,
-				string $customer_secret,
+				?string $customer_key,
+				?string $customer_secret,
 				array|int|string $product_ids,
 				array|string $license_options,
 				string $valid_object,
-				int $ttl
+				int $ttl,
+				array $request_options = array()
 			) {
 
 				// Connection variables
+				$broker_url      = isset( $request_options['broker_url'] ) && is_scalar( $request_options['broker_url'] ) ? trim( (string) $request_options['broker_url'] ) : '';
+				$customer_key    = null !== $customer_key ? trim( $customer_key ) : '';
+				$customer_secret = null !== $customer_secret ? trim( $customer_secret ) : '';
+				$has_key         = '' !== $customer_key;
+				$has_secret      = '' !== $customer_secret;
+
+				if ( $has_key !== $has_secret ) {
+					throw new ErrorException( __( 'Invalid license SDK configuration: customer key and customer secret must both be provided for direct mode, or both omitted for broker mode.', 'sdk-lmfw' ) );
+				}
+
+				if ( '' === $broker_url && ! $has_key && ! $has_secret ) {
+					$broker_url = $server_url;
+				}
+
 				$this->api_url         = rtrim( $server_url, '/' ) . '/wp-json/lmfwc/v2/';
+				$this->broker_url      = '' !== $broker_url ? rtrim( $broker_url, '/' ) . '/' : '';
 				$this->customer_key    = $customer_key;
 				$this->customer_secret = $customer_secret;
 
@@ -165,25 +192,34 @@
 			/**
 			 * HTTP Request call.
 			 *
+			 * In broker mode, sends the logical endpoint to the broker without appending consumer credentials.
+			 * In direct legacy mode, sends the logical endpoint to LMFWC and appends consumer credentials.
+			 *
 			 * @param string    $endpoint API endpoint relative to the v2 base URL.
 			 *
 			 * @return array<string, mixed>
 			 * @throws ErrorException When the server response is a WP error or an unsuccessful HTTP status.
 			 * @since 1.0.0
-			 * @version 1.1.0
+			 * @version 2.0.0
 			 *
 			 */
 			private function call( string $endpoint ): array {
+				$endpoint = ltrim( $endpoint, '/' );
+
 				// Populate the correct endpoint for the API request
-				$url = "{$this->api_url}{$endpoint}?" . http_build_query(
-					array(
-						'consumer_key'    => $this->customer_key,
-						'consumer_secret' => $this->customer_secret,
-					),
-					'',
-					'&',
-					PHP_QUERY_RFC3986
-				);
+				if ( '' !== $this->broker_url ) {
+					$url = $this->broker_url . $endpoint;
+				} else {
+					$url = "{$this->api_url}{$endpoint}?" . http_build_query(
+						array(
+							'consumer_key'    => $this->customer_key,
+							'consumer_secret' => $this->customer_secret,
+						),
+						'',
+						'&',
+						PHP_QUERY_RFC3986
+					);
+				}
 
 				// Create header
 				$headers = array(
@@ -284,11 +320,13 @@
 			/**
 			 * Verify if the license is valid.
 			 *
+			 * Keeps the last cached validation state when the license server is unavailable.
+			 *
 			 * @param string $license_key Optional license key to validate immediately.
 			 * @return array{is_valid: bool, error: string}
 			 *
 			 * @since 1.0.0
-			 * @version 1.1.0
+			 * @version 1.2.0
 			 *
 			 */
 			public function validate_status( string $license_key = '' ): array {
